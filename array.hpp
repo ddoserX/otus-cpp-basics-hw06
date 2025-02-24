@@ -15,17 +15,19 @@ namespace Container
         void insert(const size_t &pos, const T &value) override;
         void erase(const size_t &pos) override;
         size_t size() const override;
+        size_t len() const;
         const char* name() const;
 
         T &operator[](const size_t &pos) const override;
 
     private:
         size_t m_size;
+        size_t m_len;
         T *m_array;
     };
 
     template <typename T>
-    inline Array<T>::Array() : m_size{0}, m_array{nullptr}
+    inline Array<T>::Array() : m_size{0}, m_len(0), m_array{nullptr}
     {
     }
 
@@ -41,19 +43,35 @@ namespace Container
     template <typename T>
     inline void Array<T>::push_back(const T &value)
     {
-        T *new_array = new T[m_size + 1];
-
-        for (size_t i = 0; i < m_size; i++)
+        if ( (m_size + 1) >= m_len)
         {
-            new_array[i] = m_array[i];
+            if (m_len == 0)
+            {
+                m_len = 1;
+            }
+            else
+            {
+                m_len = m_len * 2;
+            }
+            
+            T *new_array = new T[m_len];
+
+            for (size_t i = 0; i < m_size; i++)
+            {
+                new_array[i] = m_array[i];
+            }
+
+            new_array[m_size] = value;
+
+            delete[] m_array;
+            m_array = new_array;
+        }
+        else
+        {
+            m_array[m_size] = value;
         }
 
-        new_array[m_size] = value;
-
-        delete[] m_array;
-
-        m_array = new_array;
-        ++m_size;
+        m_size += 1;
     }
 
     template <typename T>
@@ -65,24 +83,45 @@ namespace Container
             return;
         }
 
-        T *new_array = new T[m_size + 1];
-
-        for (size_t i = 0; i < pos; i++)
+        if ( (m_size + 1) >= m_len)
         {
-            new_array[i] = m_array[i];
+            if (m_len == 0)
+            {
+                m_len = 1;
+            }
+            else
+            {
+                m_len = m_len * 2;
+            }
+
+            T *new_array = new T[m_len];
+
+            for (size_t i = 0; i < pos; i++)
+            {
+                new_array[i] = m_array[i];
+            }
+
+            new_array[pos] = value;
+
+            for (size_t i = pos; i < m_size; i++)
+            {
+                new_array[i + 1] = m_array[i];
+            }
+
+            delete m_array;
+            m_array = new_array;
+        }
+        else
+        {
+            for (size_t i = m_size - 1; i > pos; --i)
+            {
+                m_array[i + 1] = m_array[i];
+            }
+            
+            m_array[pos] = value;
         }
 
-        new_array[pos] = value;
-
-        for (size_t i = pos; i < m_size; i++)
-        {
-            new_array[i + 1] = m_array[i];
-        }
-
-        delete m_array;
-
-        m_array = new_array;
-        ++m_size;
+        m_size += 1;
     }
 
     template <typename T>
@@ -93,7 +132,7 @@ namespace Container
             return;
         }
 
-        T *new_array = new T[m_size - 1];
+        T *new_array = new T[m_len - 1];
 
         for (size_t i = 0; i < pos; i++)
         {
@@ -108,13 +147,19 @@ namespace Container
         delete[] m_array;
 
         m_array = new_array;
-        --m_size;
+        m_size -= 1;
     }
 
     template <typename T>
     inline size_t Array<T>::size() const
     {
         return m_size;
+    }
+
+    template <typename T>
+    inline size_t Array<T>::len() const
+    {
+        return m_len;
     }
 
     template <typename T>
