@@ -10,6 +10,7 @@ namespace Container
     public:
         Array();
         ~Array();
+        Array(Array<T>&& rhs);
 
         void push_back(const T &value) override;
         void insert(const size_t &pos, const T &value) override;
@@ -19,6 +20,7 @@ namespace Container
         const char* name() const;
 
         T &operator[](const size_t &pos) const override;
+        Array<T> &operator=(Array<T>&& rhs);
 
     private:
         size_t m_size;
@@ -41,6 +43,18 @@ namespace Container
     }
 
     template <typename T>
+    inline Array<T>::Array(Array<T> &&rhs)
+    {
+        m_array = rhs.m_array;
+        m_len = rhs.m_len;
+        m_size = rhs.m_size;
+
+        rhs.m_array = nullptr;
+        rhs.m_len = 0;
+        rhs.m_size = 0;
+    }
+
+    template <typename T>
     inline void Array<T>::push_back(const T &value)
     {
         if ( (m_size + 1) >= m_len)
@@ -53,7 +67,7 @@ namespace Container
             {
                 m_len = m_len * 2;
             }
-            
+
             T *new_array = new T[m_len];
 
             for (size_t i = 0; i < m_size; i++)
@@ -177,5 +191,23 @@ namespace Container
         }
 
         return m_array[pos];
+    }
+    template <typename T>
+    inline Array<T> &Array<T>::operator=(Array<T> &&rhs)
+    {
+        if(&rhs != this)
+        {
+            delete[] m_array;
+
+            m_array = rhs.m_array;
+            m_len = rhs.m_len;
+            m_size = rhs.m_size;
+
+            rhs.m_array = nullptr;
+            rhs.m_len = 0;
+            rhs.m_size = 0;
+        }
+
+        return *this;
     }
 } // namespace Container

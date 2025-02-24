@@ -78,5 +78,29 @@ int main()
     }
 
     print_containers(containers, containers_count);
+
+    Container::Array<int> array1{};
+    array1.push_back(5);
+    Container::Array<int> array2{std::move(array1)};
+
+    print(array1);
+    print(array2);
+
+    array1 = std::move(array2);
+
+    print(array1);
+    print(array2);
+
+    Container::List<int> list1{};
+    list1.push_back(7);
+    Container::List<int> list2{std::move(list1)};
+
+    print(list1);
+    print(list2);
+
+    list1 = std::move(list2);
+
+    print(list1);
+    print(list2);
     return 0;
 }

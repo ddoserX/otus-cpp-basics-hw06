@@ -18,6 +18,7 @@ namespace Container
     public:
         List();
         ~List();
+        List(List<T>&& rhs);
 
         void push_back(const T &value) override;
         void insert(const size_t &pos, const T &value) override;
@@ -26,28 +27,38 @@ namespace Container
         const char* name() const override;
 
         T &operator[](const size_t &pos) const override;
+        List<T> &operator=(List<T>&& rhs);
 
     private:
         size_t m_size;
-        Node<T> *m_node;
         Node<T> *m_first;
         Node<T> *m_last;
 
         Node<T> *get(const size_t &pos) const;
+        void clean();
     };
 
     template <typename T>
-    inline List<T>::List() : m_size{0}, m_node{nullptr}, m_first{nullptr}, m_last{nullptr}
+    inline List<T>::List() : m_size{0}, m_first{nullptr}, m_last{nullptr}
     {
     }
 
     template <typename T>
     inline List<T>::~List()
     {
-        if (m_node != nullptr)
-        {
-            delete m_node;
-        }
+        clean();
+    }
+
+    template <typename T>
+    inline List<T>::List(List<T> &&rhs)
+    {
+        m_first = rhs.m_first;
+        m_last = rhs.m_last;
+        m_size = rhs.m_size;
+
+        rhs.m_first = nullptr;
+        rhs.m_last = nullptr;
+        rhs.m_size = 0;
     }
 
     template <typename T>
@@ -173,6 +184,25 @@ namespace Container
     }
 
     template <typename T>
+    inline List<T> &List<T>::operator=(List<T> &&rhs)
+    {
+        if (&rhs != this)
+        {
+            clean();
+
+            m_first = rhs.m_first;
+            m_last = rhs.m_last;
+            m_size = rhs.m_size;
+
+            rhs.m_first = nullptr;
+            rhs.m_last = nullptr;
+            rhs.m_size = 0;
+        }
+
+        return *this;
+    }
+
+    template <typename T>
     inline Node<T> *List<T>::get(const size_t &pos) const
     {
         if (pos >= m_size)
@@ -188,5 +218,21 @@ namespace Container
         }
 
         return ptr;
+    }
+    template <typename T>
+    inline void List<T>::clean()
+    {
+        Node<T> *ptr = m_first;
+
+        while (ptr != nullptr)
+        {
+            Node<T> *next = ptr->next;
+            delete ptr;
+            ptr = next;
+        }
+        
+        m_first = nullptr;
+        m_last = nullptr;
+        m_size = 0;
     }
 } // namespace Container
