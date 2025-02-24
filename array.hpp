@@ -1,3 +1,5 @@
+#pragma once
+
 #include "containers.hpp"
 
 namespace Container
@@ -13,6 +15,7 @@ namespace Container
         void insert(const size_t &pos, const T &value) override;
         void erase(const size_t &pos) override;
         size_t size() const override;
+        const char* name() const;
 
         T &operator[](const size_t &pos) const override;
 
@@ -112,6 +115,12 @@ namespace Container
     inline size_t Array<T>::size() const
     {
         return m_size;
+    }
+
+    template <typename T>
+    inline const char *Array<T>::name() const
+    {
+        return "container::array<T>";
     }
 
     template <typename T>

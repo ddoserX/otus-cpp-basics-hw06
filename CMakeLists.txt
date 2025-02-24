@@ -6,6 +6,7 @@ set(SRC_MAIN
     main.cpp
     containers.hpp
     array.hpp
+    list.hpp
 )
 
 add_executable(hw06 

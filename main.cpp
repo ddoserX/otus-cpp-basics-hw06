@@ -1,46 +1,82 @@
 #include "array.hpp"
+#include "list.hpp"
 #include <iostream>
 
 template <typename T>
-void print(const Container::Array<T> &arr)
+void print(const Container::IContainer<T> &arr)
 {
+    std::cout << arr.name() << std::endl;
+    std::cout << "size: " << arr.size() << std::endl;
+    std::cout << "\t";
+
     for (size_t i = 0; i < arr.size(); i++)
     {
         std::cout << arr[i] << " ";
     }
 
     std::cout << std::endl;
-    std::cout << "size: " << arr.size() << std::endl;
+}
+
+template <typename T>
+void print_containers(Container::IContainer<T> **containers, const size_t &size)
+{
+    for (size_t i = 0; i < size; i++)
+    {
+        print(*containers[i]);
+    }
 }
 
 int main()
 {
-    Container::Array<int> arr;
+    constexpr size_t containers_count = 2;
+    Container::IContainer<int> *containers[containers_count];
 
-    for (size_t i = 0; i < 10; i++)
+    containers[0] = new Container::Array<int>{};
+    containers[1] = new Container::List<int>{};
+
+    std::cout << "push_back" << std::endl;
+    for (size_t i = 0; i < containers_count; i++)
     {
-        arr.push_back(i);
+        for (size_t j = 0; j < 10; j++)
+        {
+            containers[i]->push_back(j);
+        }
     }
 
-    print(arr);
+    print_containers(containers, containers_count);
 
-    arr.erase(2);
-    arr.erase(3);
-    arr.erase(4);
+    std::cout << "erase" << std::endl;
+    for (size_t i = 0; i < containers_count; i++)
+    {
+        containers[i]->erase(2);
+        containers[i]->erase(3);
+        containers[i]->erase(4);
+    }
 
-    print(arr);
+    print_containers(containers, containers_count);
 
-    arr.insert(0, 10);
+    std::cout << "insert" << std::endl;
+    for (size_t i = 0; i < containers_count; i++)
+    {
+        containers[i]->insert(0, 10);
+    }
 
-    print(arr);
+    print_containers(containers, containers_count);
 
-    arr.insert(arr.size() / 2, 20);
+    std::cout << "insert" << std::endl;
+    for (size_t i = 0; i < containers_count; i++)
+    {
+        containers[i]->insert(containers[i]->size() / 2, 20);
+    }
 
-    print(arr);
+    print_containers(containers, containers_count);
 
-    arr.push_back(30);
+    std::cout << "push_back" << std::endl;
+    for (size_t i = 0; i < containers_count; i++)
+    {
+        containers[i]->push_back(30);
+    }
 
-    print(arr);
-
+    print_containers(containers, containers_count);
     return 0;
 }
