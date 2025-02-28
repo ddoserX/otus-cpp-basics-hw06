@@ -18,16 +18,20 @@ namespace Container
     public:
         List();
         ~List();
-        List(List<T>&& rhs);
+        List(std::initializer_list<T> l);
+        List(List<T> &rhs);
+        List(List<T> &&rhs);
 
         void push_back(const T &value) override;
         void insert(const size_t &pos, const T &value) override;
         void erase(const size_t &pos) override;
         size_t size() const override;
-        const char* name() const override;
+        bool empty() const override;
+        const char *name() const override;
+        void clean();
 
         T &operator[](const size_t &pos) const override;
-        List<T> &operator=(List<T>&& rhs);
+        List<T> &operator=(List<T> &&rhs);
 
     private:
         size_t m_size;
@@ -35,7 +39,6 @@ namespace Container
         Node<T> *m_last;
 
         Node<T> *get(const size_t &pos) const;
-        void clean();
     };
 
     template <typename T>
@@ -47,6 +50,26 @@ namespace Container
     inline List<T>::~List()
     {
         clean();
+    }
+
+    template <typename T>
+    inline List<T>::List(std::initializer_list<T> l) : m_size(0), m_first{nullptr}, m_last{nullptr}
+    {
+        auto ptr = l.begin();
+
+        for (size_t i = 0; i < l.size(); i++)
+        {
+            push_back(ptr[i]);
+        }
+    }
+
+    template <typename T>
+    inline List<T>::List(List<T> &rhs) : m_size(0), m_first{nullptr}, m_last{nullptr}
+    {
+        for (size_t i = 0; i < rhs.size(); i++)
+        {
+            push_back(rhs[i]);
+        }
     }
 
     template <typename T>
@@ -64,7 +87,7 @@ namespace Container
     template <typename T>
     inline void List<T>::push_back(const T &value)
     {
-        Node<T>* new_node = new Node<T>{};
+        Node<T> *new_node = new Node<T>{};
         new_node->data = value;
 
         if (m_last == nullptr)
@@ -91,14 +114,14 @@ namespace Container
             return;
         }
 
-        Node<T>* ptr = get(pos);
+        Node<T> *ptr = get(pos);
 
         if (ptr == nullptr)
         {
             return;
         }
 
-        Node<T>* new_node = new Node<T>{};
+        Node<T> *new_node = new Node<T>{};
         new_node->data = value;
 
         if (ptr->prev != nullptr)
@@ -113,7 +136,7 @@ namespace Container
 
         new_node->next = ptr;
         ptr->prev = new_node;
-        
+
         m_size += 1;
     }
 
@@ -125,7 +148,7 @@ namespace Container
             return;
         }
 
-        Node<T>* ptr = get(pos);
+        Node<T> *ptr = get(pos);
 
         if (ptr == nullptr)
         {
@@ -149,7 +172,7 @@ namespace Container
         {
             m_last = ptr->prev;
         }
-        
+
         delete ptr;
         m_size -= 1;
     }
@@ -158,6 +181,17 @@ namespace Container
     inline size_t List<T>::size() const
     {
         return m_size;
+    }
+
+    template <typename T>
+    inline bool List<T>::empty() const
+    {
+        if (m_size == 0 && m_first == nullptr && m_last == nullptr)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     template <typename T>
@@ -210,8 +244,7 @@ namespace Container
             return nullptr;
         }
 
-
-        Node<T>* ptr = m_first;
+        Node<T> *ptr = m_first;
         for (size_t i = 0; i < pos; ++i)
         {
             ptr = ptr->next;
@@ -230,7 +263,7 @@ namespace Container
             delete ptr;
             ptr = next;
         }
-        
+
         m_first = nullptr;
         m_last = nullptr;
         m_size = 0;

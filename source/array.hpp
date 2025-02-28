@@ -10,17 +10,20 @@ namespace Container
     public:
         Array();
         ~Array();
-        Array(Array<T>&& rhs);
+        Array(std::initializer_list<T> l);
+        Array(Array<T> &rhs);
+        Array(Array<T> &&rhs);
 
         void push_back(const T &value) override;
         void insert(const size_t &pos, const T &value) override;
         void erase(const size_t &pos) override;
         size_t size() const override;
+        bool empty() const override;
+        const char *name() const override;
         size_t len() const;
-        const char* name() const;
 
         T &operator[](const size_t &pos) const override;
-        Array<T> &operator=(Array<T>&& rhs);
+        Array<T> &operator=(Array<T> &&rhs);
 
     private:
         size_t m_size;
@@ -43,6 +46,33 @@ namespace Container
     }
 
     template <typename T>
+    inline Array<T>::Array(std::initializer_list<T> l) : m_size{l.size()}, m_len{l.size()}
+    {
+        m_array = new T[l.size()];
+
+        auto ptr = l.begin();
+
+        for (size_t i = 0; i < l.size(); i++)
+        {
+            m_array[i] = ptr[i];
+        }
+    }
+
+    template <typename T>
+    inline Array<T>::Array(Array<T> &rhs)
+    {
+        m_size = rhs.m_size;
+        m_len = rhs.m_len;
+
+        m_array = new T[rhs.size()];
+
+        for (size_t i = 0; i < rhs.m_size; i++)
+        {
+            m_array[i] = rhs.m_array[i];
+        }
+    }
+
+    template <typename T>
     inline Array<T>::Array(Array<T> &&rhs)
     {
         m_array = rhs.m_array;
@@ -57,7 +87,7 @@ namespace Container
     template <typename T>
     inline void Array<T>::push_back(const T &value)
     {
-        if ( (m_size + 1) >= m_len)
+        if ((m_size + 1) >= m_len)
         {
             if (m_len == 0)
             {
@@ -97,7 +127,7 @@ namespace Container
             return;
         }
 
-        if ( (m_size + 1) >= m_len)
+        if ((m_size + 1) >= m_len)
         {
             if (m_len == 0)
             {
@@ -131,7 +161,7 @@ namespace Container
             {
                 m_array[i + 1] = m_array[i];
             }
-            
+
             m_array[pos] = value;
         }
 
@@ -171,6 +201,17 @@ namespace Container
     }
 
     template <typename T>
+    inline bool Array<T>::empty() const
+    {
+        if (m_size == 0 || m_array == nullptr)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    template <typename T>
     inline size_t Array<T>::len() const
     {
         return m_len;
@@ -195,7 +236,7 @@ namespace Container
     template <typename T>
     inline Array<T> &Array<T>::operator=(Array<T> &&rhs)
     {
-        if(&rhs != this)
+        if (&rhs != this)
         {
             delete[] m_array;
 
