@@ -162,6 +162,22 @@ TEST(Array, CopyCtor)
     }
 }
 
+TEST(Array, CopyOperator)
+{
+    Container::Array<int> expectedArray{{0, 1, 2, 3, 4, 5}};
+    Container::Array<int> currectArray;
+
+    currectArray = expectedArray;
+
+    ASSERT_EQ(expectedArray.size(), currectArray.size());
+    ASSERT_EQ(expectedArray.len(), currectArray.len());
+
+    for (size_t i = 0; i < expectedArray.size(); i++)
+    {
+        ASSERT_EQ(expectedArray[i], currectArray[i]);
+    }
+}
+
 TEST(Array, MoveOperator)
 {
     Container::Array<int> array{{0, 1, 2, 3, 4, 5}};

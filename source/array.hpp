@@ -9,10 +9,10 @@ namespace Container
     {
     public:
         Array();
-        ~Array();
+        ~Array() override;
         Array(std::initializer_list<T> l);
-        Array(Array<T> &rhs);
-        Array(Array<T> &&rhs);
+        Array(Array<T> &rhs) noexcept;
+        Array(Array<T> &&rhs) noexcept;
 
         void push_back(const T &value) override;
         void insert(const size_t &pos, const T &value) override;
@@ -23,7 +23,8 @@ namespace Container
         size_t len() const;
 
         T &operator[](const size_t &pos) const override;
-        Array<T> &operator=(Array<T> &&rhs);
+        Array<T> &operator=(Array<T> &rhs) noexcept;
+        Array<T> &operator=(Array<T> &&rhs) noexcept;
 
     private:
         size_t m_size;
@@ -59,7 +60,7 @@ namespace Container
     }
 
     template <typename T>
-    inline Array<T>::Array(Array<T> &rhs)
+    inline Array<T>::Array(Array<T> &rhs) noexcept
     {
         m_size = rhs.m_size;
         m_len = rhs.m_len;
@@ -73,7 +74,7 @@ namespace Container
     }
 
     template <typename T>
-    inline Array<T>::Array(Array<T> &&rhs)
+    inline Array<T>::Array(Array<T> &&rhs) noexcept
     {
         m_array = rhs.m_array;
         m_len = rhs.m_len;
@@ -234,7 +235,37 @@ namespace Container
         return m_array[pos];
     }
     template <typename T>
-    inline Array<T> &Array<T>::operator=(Array<T> &&rhs)
+    inline Array<T> &Array<T>::operator=(Array<T> &rhs) noexcept
+    {
+        if (this == &rhs)
+        {
+            return *this;
+        }
+
+        if (rhs.m_size == 0)
+        {
+            return *this;
+        }
+
+        if (m_array != nullptr)
+        {
+            delete m_array;
+        }
+
+        m_array = new T[rhs.m_size];
+        m_size = rhs.m_size;
+        m_len = rhs.m_len;
+
+        for (size_t i = 0; i < rhs.m_size; i++)
+        {
+            m_array[i] = rhs[i];
+        }
+
+        return *this;
+    }
+
+    template <typename T>
+    inline Array<T> &Array<T>::operator=(Array<T> &&rhs) noexcept
     {
         if (&rhs != this)
         {

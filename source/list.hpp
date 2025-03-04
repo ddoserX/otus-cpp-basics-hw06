@@ -17,10 +17,10 @@ namespace Container
     {
     public:
         List();
-        ~List();
+        ~List() override;
         List(std::initializer_list<T> l);
-        List(List<T> &rhs);
-        List(List<T> &&rhs);
+        List(List<T> &rhs) noexcept;
+        List(List<T> &&rhs) noexcept;
 
         void push_back(const T &value) override;
         void insert(const size_t &pos, const T &value) override;
@@ -31,7 +31,8 @@ namespace Container
         void clean();
 
         T &operator[](const size_t &pos) const override;
-        List<T> &operator=(List<T> &&rhs);
+        List<T> &operator=(List<T> &rhs) noexcept;
+        List<T> &operator=(List<T> &&rhs) noexcept;
 
     private:
         size_t m_size;
@@ -64,7 +65,8 @@ namespace Container
     }
 
     template <typename T>
-    inline List<T>::List(List<T> &rhs) : m_size(0), m_first{nullptr}, m_last{nullptr}
+    inline List<T>::List(List<T> &rhs) noexcept
+        : m_size(0), m_first{nullptr}, m_last{nullptr}
     {
         for (size_t i = 0; i < rhs.size(); i++)
         {
@@ -73,7 +75,7 @@ namespace Container
     }
 
     template <typename T>
-    inline List<T>::List(List<T> &&rhs)
+    inline List<T>::List(List<T> &&rhs) noexcept
     {
         m_first = rhs.m_first;
         m_last = rhs.m_last;
@@ -218,7 +220,33 @@ namespace Container
     }
 
     template <typename T>
-    inline List<T> &List<T>::operator=(List<T> &&rhs)
+    inline List<T> &List<T>::operator=(List<T> &rhs) noexcept
+    {
+        if (this == &rhs)
+        {
+            return *this;
+        }
+
+        if (rhs.m_size == 0)
+        {
+            return *this;
+        }
+
+        if (this->empty() == false)
+        {
+            this->clean();
+        }
+
+        for (size_t i = 0; i < rhs.m_size; i++)
+        {
+            this->push_back(rhs[i]);
+        }
+
+        return *this;
+    }
+
+    template <typename T>
+    inline List<T> &List<T>::operator=(List<T> &&rhs) noexcept
     {
         if (&rhs != this)
         {

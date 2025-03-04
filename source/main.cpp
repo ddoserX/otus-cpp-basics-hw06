@@ -79,6 +79,11 @@ int main()
 
     print_containers(containers, containers_count);
 
+    for (size_t i = 0; i < containers_count; i++)
+    {
+        delete containers[i];
+    }
+
     Container::Array<int> array1{};
     array1.push_back(5);
     Container::Array<int> array2{std::move(array1)};

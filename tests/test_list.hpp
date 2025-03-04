@@ -160,6 +160,21 @@ TEST(List, IsEmpty)
     ASSERT_TRUE(list.empty());
 }
 
+TEST(List, CopyOperator)
+{
+    Container::List<int> expectedList{{0, 1, 2, 3, 4, 5}};
+    Container::List<int> currectList;
+
+    currectList = expectedList;
+
+    ASSERT_EQ(expectedList.size(), currectList.size());
+
+    for (size_t i = 0; i < expectedList.size(); i++)
+    {
+        ASSERT_EQ(expectedList[i], currectList[i]);
+    }
+}
+
 TEST(List, MoveOperator)
 {
     Container::List<int> list{{0, 1, 2, 3, 4, 5}};

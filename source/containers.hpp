@@ -10,6 +10,8 @@ namespace Container
     class IContainer
     {
     public:
+        virtual ~IContainer() = default;
+
         virtual void push_back(const T &value) = 0;
         virtual void insert(const size_t &pos, const T &value) = 0;
         virtual void erase(const size_t &pos) = 0;
